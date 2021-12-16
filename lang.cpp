@@ -18,11 +18,14 @@ static int     isoperator  (char value);
 
 static int     isbracket   (char value);
 
+static int     iscomma     (char value);
+
+
 //TODO: function for VALUE_IS_OPERATOR (OR NOT)
 
 #define $VALUE_IS_OPERATOR (value == '-' || value == '+' || value == '*' || value == '/' || value == '^' || value == '=' || value == '<' || value == '>' || value == ';'|| value == '!')
 
-#define $BUF_ELEM buf->data[buf->pos]
+#define $BUF_CUR_ELEM buf->data[buf->pos]
 
 #define $CUR_TKN_DATA_LNG tk_array->node[tk_array->current_node].data_lng 
 #define $CUR_TKN_DATA_STR tk_array->node[tk_array->current_node].data.str
@@ -34,6 +37,8 @@ static int     isbracket   (char value);
 #define $CURRENT tk_array->current_node
 
 #define $300$ printf("I was in function %s\n", __func__);
+
+#define $Require(ch) Require(ch, tk_array);
 
 void CheckPtr(void* ptr, const char* error)
 {
@@ -71,33 +76,49 @@ tkn_arr* GetAllTokens(FILE* inputfile)
 
 void GetTokens (buffer* buf, tkn_arr* tk_array)
 {
-    while( $BUF_ELEM != '$')
+    while( $BUF_CUR_ELEM != '$')
     {
-        if      (isalpha($BUF_ELEM))
+        if      (isalpha($BUF_CUR_ELEM))
         {
             $CUR_TKN_DATA_LNG = get_word(buf, tk_array);
+            $CURRENT += 1;
+
             tk_array->n_cunt += 1;
-            tk_array->current_node += 1;
         }
-        else if (isnumber($BUF_ELEM))
+        else if (isnumber($BUF_CUR_ELEM))
         {
             $CUR_TKN_DATA_LNG = get_num(buf, tk_array);
+            $CURRENT += 1;
+
             tk_array->n_cunt += 1;
-            tk_array->current_node += 1;
         }
-        else if (isoperator($BUF_ELEM))
+        else if (isoperator($BUF_CUR_ELEM))
         {
             $CUR_TKN_DATA_LNG = get_op(buf, tk_array);
+            $CURRENT += 1;
+
             tk_array->n_cunt += 1;
-            tk_array->current_node += 1;
         }
-        else if (isbracket($BUF_ELEM))
+        else if (isbracket($BUF_CUR_ELEM))
         {
             $CUR_TKN_DATA_LNG = get_bracket(buf, tk_array);
+            $CURRENT += 1;
+
             tk_array->n_cunt += 1;
-            tk_array->current_node += 1;
         }
-        else if (isspace($BUF_ELEM))
+        else if (iscomma($BUF_CUR_ELEM))
+        {
+            $CUR_TKN_DATA_LNG = 1;
+            $CUR_TKN_DATA_CHR = ',';
+            $CUR_TKN_DATA_TYP = COMMA;
+
+            $CURRENT += 1;
+            
+            buf->pos += 1;
+
+            tk_array->n_cunt += 1;
+        }
+        else if (isspace($BUF_CUR_ELEM))
         {
             space_skip(buf);
         }
@@ -113,7 +134,7 @@ void GetTokens (buffer* buf, tkn_arr* tk_array)
 
 void    space_skip  (buffer* buf)
 {
-    while(isspace($BUF_ELEM))
+    while(isspace($BUF_CUR_ELEM))
     {
         buf->pos += 1;
     }
@@ -121,7 +142,7 @@ void    space_skip  (buffer* buf)
 
 int     get_bracket (buffer* buf, tkn_arr* tk_array)
 {
-    $CUR_TKN_DATA_CHR = $BUF_ELEM;
+    $CUR_TKN_DATA_CHR = $BUF_CUR_ELEM;
 
     buf->pos += 1;
 
@@ -134,16 +155,15 @@ int     get_op      (buffer* buf, tkn_arr* tk_array)
 {
     int cunt = 0;
     char* op = NULL;
-    op = &($BUF_ELEM);
+    op = &($BUF_CUR_ELEM);
 
-    $CUR_TKN_DATA_CHR = $BUF_ELEM;
+    $CUR_TKN_DATA_CHR = $BUF_CUR_ELEM;
 
-    while(isoperator($BUF_ELEM))
+    while(isoperator($BUF_CUR_ELEM))
     {
         cunt += 1;
         buf->pos += 1;
     }
-
     if (cunt > 1 || $CUR_TKN_DATA_CHR == '<' || $CUR_TKN_DATA_CHR == '>')
     {
         $CUR_TKN_DATA_TYP = REL_OPERATOR;
@@ -161,12 +181,12 @@ int     get_num     (buffer* buf, tkn_arr* tk_array)
     int cunt = 0;
     double tmp_dbl = 0;
 
-    while(isnumber($BUF_ELEM))
+    while(isnumber($BUF_CUR_ELEM))
     {
         cunt += 1;
 
         tmp_dbl *= 10;
-        tmp_dbl += $BUF_ELEM - '0';
+        tmp_dbl += $BUF_CUR_ELEM - '0';
 
         buf->pos += 1;
     }
@@ -182,9 +202,9 @@ int     get_word    (buffer* buf, tkn_arr* tk_array)
 {
     int cunt = 0;
 
-    $CUR_TKN_DATA_STR = &($BUF_ELEM);
+    $CUR_TKN_DATA_STR = &($BUF_CUR_ELEM);
     
-    while (isalpha($BUF_ELEM))
+    while (isalpha($BUF_CUR_ELEM))
     {
         cunt += 1;
         buf->pos += 1;
@@ -195,6 +215,12 @@ int     get_word    (buffer* buf, tkn_arr* tk_array)
 
     else if (strncmp($CUR_TKN_DATA_STR, "while", 5) == EQUAL)
         $CUR_TKN_DATA_TYP = WHILE;
+    
+    else if (strncmp($CUR_TKN_DATA_STR, "else", 4) == EQUAL)
+        $CUR_TKN_DATA_TYP = ELSE;
+
+    else if (strncmp($CUR_TKN_DATA_STR, "return", 6) == EQUAL)
+        $CUR_TKN_DATA_TYP = RETURN;
 
     else
         $CUR_TKN_DATA_TYP = VARIABLE;
@@ -230,6 +256,16 @@ int     isbracket   (char value)
         return 0;
 }
 
+int     iscomma (char value)
+{
+    if (value == ',')
+    {
+        return 1;
+    }
+    else 
+        return 0;
+}
+
 void PrintAllTokens (tkn_arr* tk_array)
 {
     for(int i = 0 ; i < tk_array->n_cunt ; i++)
@@ -243,8 +279,20 @@ void PrintAllTokens (tkn_arr* tk_array)
         else if (tk_array->node[i].data_type == WHILE)
             printf("%d) data = %.*s || type = KEYWORD\n", i, tk_array->node[i].data_lng, tk_array->node[i].data.str);
         
+        else if (tk_array->node[i].data_type == ELSE)
+            printf("%d) data = %.*s || type = KEYWORD\n", i, tk_array->node[i].data_lng, tk_array->node[i].data.str);
+        
+        else if (tk_array->node[i].data_type == RETURN)
+            printf("%d) data = %.*s || type = KEYWORD\n", i, tk_array->node[i].data_lng, tk_array->node[i].data.str);
+        
+        else if (tk_array->node[i].data_type == OPERATOR)
+            printf("%d) data = %c || type = OPERATOR\n", i, tk_array->node[i].data.ch);
+
+        else if (tk_array->node[i].data_type == COMMA)
+            printf("%d) data = %c || type = COMMA\n", i, tk_array->node[i].data.ch);
+
         else if (tk_array->node[i].data_type == REL_OPERATOR)
-            printf("%d) data = %.*s || type = OPERATOR\n", i, tk_array->node[i].data_lng, tk_array->node[i].data.str);
+            printf("%d) data = %.*s || type = REL_OPERATOR\n", i, tk_array->node[i].data_lng, tk_array->node[i].data.str);
 
         else if (tk_array->node[i].data_type == VARIABLE)
             printf("%d) data = %.*s || type = VARIABLE\n", i, tk_array->node[i].data_lng, tk_array->node[i].data.str);
@@ -258,27 +306,48 @@ void PrintAllTokens (tkn_arr* tk_array)
 }
 
 Node* GetG (tkn_arr* tk_array)
-{$300$
+{
     tk_array->current_node = 0;
 
     Tree* tree = (Tree*) calloc(1, sizeof(Tree));
     
-    tree->peak = GetE(tk_array);
-    $300$    
+    tree->peak = GetStmts(tk_array);
+        
     if ($CUR_TKN_DATA_CHR == '$') $CURRENT += 1;
     
     else
     {   
+        printf("It is not '$', it is %c", $CUR_TKN_DATA_CHR);
         SyntaxERROR(__func__);
     }
-    printf("HRSH HRSH HRSH !!, %d!", tree->peak);
+    if (tree->peak != NULL)
+    {
+        printf("HRSH HRSH HRSH !!!");
+    }   
+    else 
+        printf("NE HRSH NE HRSH NE HRSH !");
 
     return tree->peak; 
 }
-/*
+
 Node* GetStmts (tkn_arr* tk_array)
 {
+    if ($CUR_TKN_DATA_CHR == '$' || $CUR_TKN_DATA_CHR == '}')
+    {
+        return NULL;
+    }
+    else 
+    {
+        Node* stmt_node = CreateNode(STATEMENT);
+		
+		Node* stmt  = GetStmt(tk_array);
+		Node* stmts_after = GetStmts(tk_array);
 
+        stmt_node->left  = stmts_after;
+        stmt_node->right = stmt;
+
+		return stmt_node;
+    }
 }
 
 Node* GetStmt (tkn_arr* tk_array)
@@ -286,21 +355,124 @@ Node* GetStmt (tkn_arr* tk_array)
     switch($CUR_TKN_DATA_TYP)
     {
         case VARIABLE:
+        {
+            int start_current = $CURRENT;
+            $CURRENT += 1;
+            if ($CUR_TKN_DATA_CHR == '(')
+            {
+                while ($CUR_TKN_DATA_CHR != ')')
+                    $CURRENT += 1;
 
+                $CURRENT += 1;
+
+                if ($CUR_TKN_DATA_CHR = '{')
+                {
+                    $CURRENT = start_current;
+                    Node* define_node = CreateNode(DEFINE);
+                    Node* func_node = CreateNode(FUNCTION);
+
+                    define_node->left = func_node;
+
+                    func_node->left = &($CURRENT_TOKEN);
+                    
+                    $CURRENT += 1;
+                    $Require('(');
+                    func_node->right = GetArgs(tk_array);
+                    $Require(')');
+
+                    $Require('{');
+                    define_node->right = GetStmts(tk_array);
+                    $Require('}');
+
+                    return define_node;
+                }
+                else 
+                    $CURRENT = start_current;
+            }
+            else 
+                $CURRENT = start_current;
+        }
+        case CONSTANT:
+        {
+            Node* left_part_stmt = GetE(tk_array);
+
+            Node* op_node = &($CURRENT_TOKEN);
+
+            if ($CUR_TKN_DATA_CHR != '=' && $CUR_TKN_DATA_TYP != REL_OPERATOR)
+                SyntaxERROR(__func__);
+
+            $CURRENT += 1;
+
+            op_node->right = GetE(tk_array);
+            op_node->left = left_part_stmt;
+
+            if ($CUR_TKN_DATA_CHR == ')');
+            else
+                $Require(';');
+
+            return op_node;
             break;
+        }
         case IF:
+        {
+            Node* if_node = &($CURRENT_TOKEN);
+            $CURRENT += 1;
 
+            $Require('(');
+            if_node->left = GetStmt(tk_array);
+            $Require(')');
+
+            $Require('{');
+            Node* desision = CreateNode(DESISION);
+            if_node->right = desision;
+            desision->left = GetStmts(tk_array);
+            $Require('}');
+
+            if ($CUR_TKN_DATA_TYP == ELSE)           
+            {
+                $CURRENT += 1;
+
+                $Require('{');
+                desision->right = GetStmts(tk_array);
+                $Require('}');
+            }
+
+            return if_node;
             break;
+        }
         case WHILE:
-        
+        { 
+            Node* while_node = &($CURRENT_TOKEN);
+
+            $CURRENT += 1;
+
+            $Require('(');
+            while_node->left = GetStmt(tk_array);
+            $Require(')');
+
+            $Require('{');
+            while_node->right = GetStmts(tk_array);
+            $Require('}');
+
+            return while_node;
             break;
+        }
+        case RETURN:
+        {
+            Node* return_node = &($CURRENT_TOKEN);
+            $CURRENT += 1;
+            return_node->left = GetE(tk_array);
+            $Require(';');
+
+            return return_node;
+        }
     }
 }
-*/
+
 Node* GetE (tkn_arr* tk_array)
-{$300$
+{
     Node* val = GetT(tk_array);
-    $300$
+    
     Node* op = val;
     Node* old_op = val;
     while($CUR_TKN_DATA_TYP == OPERATOR && ($CUR_TKN_DATA_CHR == '+' || $CUR_TKN_DATA_CHR == '-'))
@@ -311,7 +483,7 @@ Node* GetE (tkn_arr* tk_array)
         $CURRENT += 1;
         
         Node* val2 = GetT(tk_array);
-        $300$
+        
         
         op->left = old_op; // TODO bind_l_r(old_op, op, val2)
         
@@ -322,9 +494,9 @@ Node* GetE (tkn_arr* tk_array)
 }
 
 Node* GetT (tkn_arr* tk_array)
-{$300$
+{
     Node* val = GetP(tk_array);
-    $300$
+    
     Node* op = val;
     Node* old_op = val;
 
@@ -337,7 +509,7 @@ Node* GetT (tkn_arr* tk_array)
 
         Node* val2 = GetP(tk_array);
 
-        $300$
+        
         op->left = old_op; // TODO bind_l_r(old_op, op, val2)
         op->right = val2;
     }
@@ -347,33 +519,36 @@ Node* GetT (tkn_arr* tk_array)
 }
 
 Node* GetP (tkn_arr* tk_array)
-{$300$
+{
     if ($CUR_TKN_DATA_CHR == '(')
     {
         $CURRENT += 1;
         Node* val = GetE(tk_array);
-        $300$
+        
         $CURRENT += 1;
         return val;
     }
     else 
     {
         Node* val2 = GetN(tk_array);
-        $300$
+        
         return val2;
     }
 }
 
 Node* GetN (tkn_arr* tk_array)
-{$300$
-    Node* val = &($CURRENT_TOKEN);
+{
+    Node* val = NULL;
 
     if ($CUR_TKN_DATA_TYP == CONSTANT)
+    {
+        val = &($CURRENT_TOKEN);
         $CURRENT += 1;
-    
+    }
+
     else if ($CUR_TKN_DATA_TYP == VARIABLE)
     {
-        Node* val = GetV(tk_array);
+        val = GetV(tk_array);
     }
     
     else
@@ -385,19 +560,96 @@ Node* GetN (tkn_arr* tk_array)
 }
 
 Node* GetV (tkn_arr* tk_array)
-{$300$
+{
     Node* val = &($CURRENT_TOKEN);
 
     $CURRENT += 1;
 
-    if ($CUR_TKN_DATA_TYP == BRACKET)
-    ; // TODO function as variable !!!
+    if ($CUR_TKN_DATA_CHR == '(')
+    {
+        printf("it is function)))\n");
+        $CURRENT += 1;
 
+        Node* call_node = CreateNode(CALL);
+        Node* func_node = CreateNode(FUNCTION);
+        
+        call_node->left = func_node;
+
+        func_node->left = val;
+
+        if ($CUR_TKN_DATA_CHR == ')')
+        {
+            printf("but without args!\n");
+            $CURRENT += 1;
+
+            return call_node;
+        }
+
+        else
+        {
+            func_node->right = GetArgs(tk_array);
+            $Require(')');
+            return call_node;
+        }
+    }
+    
     return val;
 }
 
+Node* GetArgs (tkn_arr* tk_array)
+{
+    if ($CUR_TKN_DATA_CHR == ')')
+    {
+        return NULL;
+    }
+
+    else
+    {
+        if ($CUR_TKN_DATA_CHR == ',')
+            $CURRENT += 1;
+        
+        Node* param_node = CreateNode(PARAMETER);
+		
+		Node* param  = GetArg(tk_array);
+		Node* params_after = GetArgs(tk_array);
+
+        param_node->left  = params_after;
+        param_node->right = param;
+
+		return param_node;
+    }
+
+}
+
+Node* GetArg (tkn_arr* tk_array)
+{
+    Node* var = GetE(tk_array);
+    
+    return var;
+}
+
 void SyntaxERROR (const char* s)
-{$300$
+{
     printf("Ha ha oshibsya in function %s\n", s);
     assert(0);
+}
+
+void Require (char ch, tkn_arr* tk_array)
+{
+    if ($CUR_TKN_DATA_CHR == ch)
+        $CURRENT += 1;
+
+    else
+    {
+        printf("Incorrect input, expected '%c' but have '%c'\n", ch, $CUR_TKN_DATA_CHR);
+        assert(0);
+    }
+}
+
+Node* CreateNode (int node_type)
+{
+    Node* node = (Node*) calloc(1, sizeof(Node));
+    node->data_type = node_type;
+    
+    return node;
 }

@@ -11,7 +11,7 @@
 
 #include "tree.h"
 
-const int MAX_TKN_CUNT = 100;
+const int MAX_TKN_CUNT = 150;
 
 enum strncmp
 {
@@ -40,6 +40,10 @@ void        PrintAllTokens  (tkn_arr* array);
 
 Node*       GetG            (tkn_arr* tk_array);
 
+Node*       GetStmts        (tkn_arr* tk_array);
+
+Node*       GetStmt         (tkn_arr* tk_array);
+
 Node*       GetE            (tkn_arr* tk_array);
 
 Node*       GetT            (tkn_arr* tk_array);
@@ -50,6 +54,14 @@ Node*       GetN            (tkn_arr* tk_array);
 
 Node*       GetV            (tkn_arr* tk_array);
 
+Node*       GetArgs         (tkn_arr* tk_array);
+
+Node*       GetArg          (tkn_arr* tk_array);
+
+void        Require         (char ch, tkn_arr* tk_array);
+
 void        SyntaxERROR     (const char* s);
+
+Node*       CreateNode      (int node_type);
 
 #endif

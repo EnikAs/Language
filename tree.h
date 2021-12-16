@@ -45,7 +45,20 @@ enum node_data_type
     BRACKET,
     DOLLAR,
     IF,
-    WHILE
+    WHILE,
+    ELSE,
+    COMMA
+};
+
+enum exept_node_data_type
+{
+    DESISION = 228,
+    STATEMENT,
+    DEFINE,
+    FUNCTION,
+    RETURN,
+    CALL,
+    PARAMETER
 };
 
 enum operator_type

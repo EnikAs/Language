@@ -37,15 +37,59 @@ int VisitDumpPrint(const Node* node)
         return 0; // TODO Errors
     if (node->data_type == CONSTANT)
     {
-        fprintf(log_file, "%d [label =\"%lf\"];\n", node, node->data.dbl);
+        fprintf(log_file, "%d [label =\"%.0lf\"];\n", node, node->data.dbl);
     }
     else if (node->data_type == OPERATOR)
     {
         fprintf(log_file, "%d [label =\"%c\"];\n", node, node->data.ch);
     }
+    else if (node->data_type == WHILE)
+    {
+        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+    }
+    else if (node->data_type == IF)
+    {
+        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+    }
+    else if (node->data_type == ELSE)
+    {
+        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+    }
+    else if (node->data_type == RETURN)
+    {
+        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+    }
+    else if (node->data_type == REL_OPERATOR)
+    {
+        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+    }
     else if (node->data_type == VARIABLE)
     {
         fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+    }
+    else if (node->data_type == DESISION)
+    {
+        fprintf(log_file, "%d [label =\"desision\"];\n", node);
+    }
+    else if (node->data_type == STATEMENT)
+    {
+        fprintf(log_file, "%d [label =\"statement\"];\n", node);
+    }
+    else if (node->data_type == DEFINE)
+    {
+        fprintf(log_file, "%d [label =\"define\"];\n", node);
+    }
+    else if (node->data_type == CALL)
+    {
+        fprintf(log_file, "%d [label =\"call\"];\n", node);
+    }
+    else if (node->data_type == PARAMETER)
+    {
+        fprintf(log_file, "%d [label =\"parameter\"];\n", node);
+    }
+    else if (node->data_type == FUNCTION)
+    {
+        fprintf(log_file, "%d [label =\"function\"];\n", node);
     }
     if (node->left)
     {
@@ -64,7 +108,6 @@ int VisitDumpPrint(const Node* node)
 
 int TreeDump (Node* node)
 {   
-    PRINT_LINE
     fprintf(log_file, "digraph tree {\n");
     VisitDumpPrint(node);
     fprintf(log_file, "\n}");
