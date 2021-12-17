@@ -1,16 +1,22 @@
-main (a, b, c)
-{
-    a = b + c;
-    c = b + a; 
-    b = a + c;
-    return a + b;
-}
+main(a, b)
+word_stress
+    a = b + 2;
 
-1 = func(a, b, a + b);
+    zvOnit a;
+for_weak_people
 
-if (a == b)
-{
-    x = 3;
-}
+krasivEe(a >= b)
+word_stress
+    b = b + 1;
+for_weak_people
 
+tortbl(a == 0)
+word_stress
+    a = 3;
+for_weak_people
+
+lattE
+word_stress
+    a = 0;
+for_weak_people
 $

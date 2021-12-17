@@ -1,5 +1,5 @@
-#ifndef LANG_H_INCLUDED
-#define LANG_H_INCLUDED
+#ifndef FRONTEND_H_INCLUDED
+#define FRONTEND_H_INCLUDED
 
 #include <iostream>
 #include <cstring>

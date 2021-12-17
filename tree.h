@@ -17,6 +17,8 @@ const int MAX_STR_SIZE = 1000;
 
 #define TYPE_UNION
 
+const int ERROR = 0;
+
 enum kostyl
 {
     RIGHT,

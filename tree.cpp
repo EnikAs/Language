@@ -45,19 +45,19 @@ int VisitDumpPrint(const Node* node)
     }
     else if (node->data_type == WHILE)
     {
-        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+        fprintf(log_file, "%d [label =\"while\"];\n", node);
     }
     else if (node->data_type == IF)
     {
-        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+        fprintf(log_file, "%d [label =\"if\"];\n", node);
     }
     else if (node->data_type == ELSE)
     {
-        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+        fprintf(log_file, "%d [label =\"else\"];\n", node);
     }
     else if (node->data_type == RETURN)
     {
-        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+        fprintf(log_file, "%d [label =\"return\"];\n", node);
     }
     else if (node->data_type == REL_OPERATOR)
     {
@@ -93,13 +93,13 @@ int VisitDumpPrint(const Node* node)
     }
     if (node->left)
     {
-        fprintf(log_file, "%d -> %d ;\n", node, node->left);
+        fprintf(log_file, "%d -> %d [label = \"L\"];\n", node, node->left);
         VisitDumpPrint(node->left);    
     }
 
     if (node->right)
     {
-        fprintf(log_file, "%d -> %d ;\n", node, node->right);
+        fprintf(log_file, "%d -> %d [label = \"R\"];\n", node, node->right);
         VisitDumpPrint(node->right);
     }
 

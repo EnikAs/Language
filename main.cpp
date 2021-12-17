@@ -1,4 +1,5 @@
-#include "lang.h"
+#include "frontend.h"
+#include "backend.h"
 
 int main()
 {

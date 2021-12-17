@@ -1,4 +1,4 @@
-#include "lang.h"
+#include "frontend.h"
 
 static void    CheckPtr    (void* ptr, const char* error);
 
@@ -35,7 +35,6 @@ static int     iscomma     (char value);
 
 #define $CURRENT_TOKEN tk_array->node[tk_array->current_node]
 #define $CURRENT tk_array->current_node
-
 #define $300$ printf("I was in function %s\n", __func__);
 
 #define $Require(ch) Require(ch, tk_array);
@@ -204,22 +203,41 @@ int     get_word    (buffer* buf, tkn_arr* tk_array)
 
     $CUR_TKN_DATA_STR = &($BUF_CUR_ELEM);
     
-    while (isalpha($BUF_CUR_ELEM))
+    while (isalpha($BUF_CUR_ELEM) || $BUF_CUR_ELEM == '_')
     {
         cunt += 1;
         buf->pos += 1;
     }
 
-    if (strncmp($CUR_TKN_DATA_STR, "if", 2) == EQUAL)
+    if (strncmp($CUR_TKN_DATA_STR, "for_weak_people", 15) == EQUAL)
+        {
+            printf("GET IT \n");
+            $CUR_TKN_DATA_CHR = '}';
+            $CUR_TKN_DATA_TYP = BRACKET;
+            cunt = 1;
+
+            return cunt;
+        }
+    
+    else if (strncmp($CUR_TKN_DATA_STR, "word_stress", 11) == EQUAL)
+        {
+            $CUR_TKN_DATA_CHR = '{';
+            $CUR_TKN_DATA_TYP = BRACKET;
+            cunt = 1;
+            
+            return cunt;
+        }
+
+    else if (strncmp($CUR_TKN_DATA_STR, "tortbl", 6) == EQUAL)
         $CUR_TKN_DATA_TYP = IF;
 
-    else if (strncmp($CUR_TKN_DATA_STR, "while", 5) == EQUAL)
+    else if (strncmp($CUR_TKN_DATA_STR, "krasivEe", 8) == EQUAL)
         $CUR_TKN_DATA_TYP = WHILE;
     
-    else if (strncmp($CUR_TKN_DATA_STR, "else", 4) == EQUAL)
+    else if (strncmp($CUR_TKN_DATA_STR, "lattE", 5) == EQUAL)
         $CUR_TKN_DATA_TYP = ELSE;
 
-    else if (strncmp($CUR_TKN_DATA_STR, "return", 6) == EQUAL)
+    else if (strncmp($CUR_TKN_DATA_STR, "zvOnit", 6) == EQUAL)
         $CUR_TKN_DATA_TYP = RETURN;
 
     else
@@ -320,12 +338,14 @@ Node* GetG (tkn_arr* tk_array)
         printf("It is not '$', it is %c", $CUR_TKN_DATA_CHR);
         SyntaxERROR(__func__);
     }
-    if (tree->peak != NULL)
+    if (tree->peak == NULL)
     {
-        printf("HRSH HRSH HRSH !!!");
+        assert(ERROR && "Something goes wrong, tree->peak = NULL");
     }   
     else 
-        printf("NE HRSH NE HRSH NE HRSH !");
+    {
+        printf("Correct end of GetG !\n");
+    }
 
     return tree->peak; 
 }
@@ -653,3 +673,13 @@ Node* CreateNode (int node_type)
     
     return node;
 }
+
+// zvOnit = retuen
+// krasivEe = while
+// tortbl = if
+//  
+//      
+//  
+//  
+//  
+//  
