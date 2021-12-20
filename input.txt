@@ -1,7 +1,47 @@
-x = 1; 
-krasivEe (x == 9)
+a = 0;
+b = 0;
+c = 0;
+ans = 0;
+scan(a);
+scan(b);
+scan(c);
+tortbl (a == 0)
 {
-    x = x + 1;
+    solve_linear(b, c);
+}
+lattE
+{
+    a = 12; 
 }
 
+
+solve_linear(b, c)
+{
+    tortbl (b == 0)
+    {
+        tortbl (c == 0)
+        {
+            print(0);
+        }
+        lattE 
+        {
+            c = c * (1 - 2);
+            print(c);
+        }
+    }
+    lattE 
+    {
+        tortbl (c == 0)
+        {
+            print(14);
+            print(8);
+            print(8);
+        }
+        lattE 
+        {
+            b = (1 - 2) * b / c;
+            print(b);
+        }
+    }
+}
 $

@@ -1,7 +1,7 @@
 #ifndef FRONTEND_H_INCLUDED
 #define FRONTEND_H_INCLUDED
 
-//#include "C:\TXLib\TX\TXLib.h"
+#include "C:\TXLib\TX\TXLib.h"
 
 #include <iostream>
 #include <cstring>
@@ -13,9 +13,9 @@
 
 #include "tree.h"
 
-const int KOSTYL = 1;
+const int KOSTYL = 2;
 const int EXTRA = 1;
-const int MAX_TKN_CUNT = 150;
+const int MAX_TKN_CUNT = 250;
 
 enum strncmp
 {

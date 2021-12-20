@@ -24,6 +24,25 @@ if (node)                                         \
 //#define $PRINT(...) printf(__VA_ARGS__)
 
 //==========================================================================
+int GenerateAsmCode(Node* node)
+{
+    var_lists* vr_lists = (var_lists*) calloc(1, sizeof(var_lists));
+
+    vr_lists->var = (var_list*) calloc(VAR_MAX_CUNT, sizeof(var_list));
+
+    FILE* com_file = fopen("asm_file.txt", "w");
+
+    $PRINT("PUSH 0\nPOP dx\n");
+    VisitPrintCommands(node, vr_lists, com_file);
+    $PRINT("HLT");
+
+    free(vr_lists->var);
+    free(vr_lists);
+    fclose(com_file);
+
+    return 0;
+}
+//==========================================================================
 int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
 {
     switch($ND_TYP)
@@ -95,8 +114,6 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
 
             if (tmp_var_num == -1)
             {
-                printf("Variable not found !\n");
-
                 $FREE_VAR.var_hash     = tmp_var_hash;
                 $FREE_VAR.var_dx_shift = $FREE;
                 tmp_var_num            = $FREE;
@@ -104,18 +121,19 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
                 $FREE += 1;
             }
 
-            $PRINT("[dx + %d]\n", vr_lists->var[tmp_var_num].var_dx_shift);
+            $PRINT("[%d+dx]\n", vr_lists->var[tmp_var_num].var_dx_shift);
 
             break;
         }
         case CONSTANT:
         {
-            $PRINT("%.1lf\n", $ND_DBL);
+            $PRINT("%lf\n", $ND_DBL);
 
             break;
         }
         case DEFINE:
         {
+            $PRINT("JMP :funcskip%p\n", node);
             var_lists vr_lists_new = {};
             vr_lists_new.var = (var_list*) calloc(MAX_STR_SIZE, sizeof(var_list));
             
@@ -128,17 +146,18 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             printf("Number of args = %d\n", vr_lists_new.free);
             for (int i = vr_lists_new.free - 1 ; i >= 0 ; i--)
             {
-                $PRINT("POP [dx + %d]\n", i);
+                $PRINT("POP [%d+dx]\n", i);
             }
+            $PRINT("PUSH ex\n");
             $VISIT_NEW_LIST($R, &vr_lists_new);
 
             free(vr_lists_new.var);
-
+            $PRINT("::funcskip%p\n", node);
             break;
         }
         case FUNCTION:
         {
-            $PRINT("\t::%.*s\n", node->left->data_lng, node->left->data.str);
+            $PRINT("::%.*s\n", node->left->data_lng, node->left->data.str);
 
             $VISIT($R);
 
@@ -174,14 +193,15 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             {  
                 $PRINT("IN\n");
                 $PRINT("POP ");
-
+                
                 int tmp_hash    = murmurHash(node->right->right->data.str, node->right->right->data_lng);
                 int tmp_var_num = FindVariable(vr_lists, tmp_hash);
                 if (tmp_var_num == -1 )
                     assert(0 && "VARIABLE IN SCAN NOT FOUND");
 
-                $PRINT("[dx + %d]\n", vr_lists->var[tmp_var_num].var_dx_shift);
+                $PRINT("[%d+dx]\n", vr_lists->var[tmp_var_num].var_dx_shift);
             }
+            
             else if (strncmp(node->left->data.str, "print", 5) == 0)
             {
                 int tmp_hash    = murmurHash(node->right->right->data.str, node->right->right->data_lng);
@@ -189,26 +209,42 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
                 if (tmp_var_num == -1 )
                     assert(0 && "VARIABLE IN PRINT NOT FOUND");
 
-                $PRINT("PUSH [dx + %d]\n", vr_lists->var[tmp_var_num].var_dx_shift);
+                $PRINT("PUSH [%d+dx]\n", vr_lists->var[tmp_var_num].var_dx_shift);
                 $PRINT("PRCH\n");
             }
+
+            else if (strncmp(node->left->data.str, "sqrt", 4) == 0)
+            {
+                int tmp_hash    = murmurHash(node->right->right->data.str, node->right->right->data_lng);
+                int tmp_var_num = FindVariable(vr_lists, tmp_hash);
+                if (tmp_var_num == -1 )
+                    assert(0 && "VARIABLE IN PRINT NOT FOUND");
+
+                $PRINT("PUSH [%d+dx]\n", vr_lists->var[tmp_var_num].var_dx_shift);
+                $PRINT("SQRT\n");
+            }
+            
             else
             {
-                Move_dx(vr_lists->free, com_file, PLUS);
                 $VISIT($R);
+                Move_dx(vr_lists->free, com_file, PLUS);
                 $PRINT("CALL :%.*s\n", node->left->data_lng, node->left->data.str);
                 Move_dx(vr_lists->free, com_file, MINUS);
+                $PRINT("PUSH ax\n");
             }
 
             break;
         }
         case RETURN:
         {
-            $PRINT("PUSH ");
+            //$PRINT("POP ex\n");
+            if ($L->data_type == CONSTANT || $L->data_type == VARIABLE)
+                $PRINT("PUSH ");
             $VISIT($L);
-
-            $PRINT("PUSH ex\nRET\n");
-
+            $PRINT("POP ax\n");
+            //$PRINT("POP ex\n");
+            //$PRINT("PUSH ex\n");
+            $PRINT("RET\n");
             break;
         }
         case IF:
@@ -223,9 +259,9 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             $PRINT("JNE :itrue%p\n", node);
             $VISIT($R);
             $PRINT("JMP :iend%p\n", node);
-            $PRINT("\t::itrue%p\n", node);
+            $PRINT("::itrue%p\n", node);
             $VISIT($L);
-            $PRINT("\t::iend%p\n", node);
+            $PRINT("::iend%p\n", node);
 
             break;
         }
@@ -267,23 +303,23 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             }
             $PRINT("PUSH 0\n");
             $PRINT("JMP :ifisfalse%p\n",node);
-            $PRINT("\t::ifistrue%p\n", node);
+            $PRINT("::ifistrue%p\n", node);
             $PRINT("PUSH 1\n");
-            $PRINT("\t::ifisfalse%p\n", node);
+            $PRINT("::ifisfalse%p\n", node);
             $PRINT("PUSH 0\n");
 
             break;
         }
         case WHILE:
         {
-            $PRINT("\t::whilestrt%p\n", node);
+            $PRINT("::whilestrt%p\n", node);
             $VISIT($L);
             $PRINT("JNE :wtrue%p\n", node);
             $PRINT("JMP :wfalse%p\n", node);
-            $PRINT("\t::wtrue%p\n", node);
+            $PRINT("::wtrue%p\n", node);
             $VISIT($R);
             $PRINT("JMP :whilestrt%p\n", node);
-            $PRINT("\t::wfalse%p\n", node);
+            $PRINT("::wfalse%p\n", node);
             
             break;
         }

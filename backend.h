@@ -2,7 +2,7 @@
 #define BACKEND_H_INCLUDED
 #include "tree.h"
 
-const int VAR_MAX_CUNT = 25;
+const int VAR_MAX_CUNT = 100;
 
 
 enum move_dx_key
@@ -23,20 +23,22 @@ struct var_lists
     int free = 0;
 };
 
+int     GenerateAsmCode         (Node* node);
 
-int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file);
+int     VisitPrintCommands      (Node* node, var_lists* vr_lists, FILE* com_file);
 
-int Move_dx (int shift, FILE* com_file, int key);
+int     Move_dx                 (int shift, FILE* com_file, int key);
 
-int FindVariable (var_lists* vr_list, int hash);
+int     FindVariable            (var_lists* vr_list, int hash);
 
-int murmurHash (char* key, unsigned int len);
+int     murmurHash              (char* key, unsigned int len);
 
 #endif
 
 /*
     dx - for variable in RAM
     ex - for return ip
+    ax - used for return value
 // zvOnit = retuen
 // krasivEe = while
 // tortbl = if
