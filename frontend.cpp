@@ -37,7 +37,7 @@ static int     iscomma     (char value);
 #define $CURRENT tk_array->current_node
 #define $300$ printf("I was in function %s\n", __func__);
 
-#define $Require(ch) Require(ch, tk_array);
+#define $Require(ch) Require(ch, tk_array)
 
 void CheckPtr(void* ptr, const char* error)
 {
@@ -52,13 +52,13 @@ tkn_arr* GetAllTokens(FILE* inputfile)
 {
     assert(inputfile);
 
-    buffer* buf = (buffer*) calloc(1, sizeof(buffer)); 
+    buffer* buf = (buffer*) calloc(1 + KOSTYL, sizeof(buffer)); 
     CheckPtr(buf, "buffer callocation error!");
 
     buf->pos = 0;
     buf->size = scanf_file_size(inputfile);
-
-    buf->data = (char*) calloc(buf->size, sizeof(char));
+    printf("%d ", buf->size);
+    buf->data = (char*) calloc(buf->size + 1000, sizeof(char));
     CheckPtr(buf->data, "Buffer callocation error!");
 
     fread(buf->data, sizeof(char), buf->size, inputfile);
@@ -211,7 +211,6 @@ int     get_word    (buffer* buf, tkn_arr* tk_array)
 
     if (strncmp($CUR_TKN_DATA_STR, "for_weak_people", 15) == EQUAL)
         {
-            printf("GET IT \n");
             $CUR_TKN_DATA_CHR = '}';
             $CUR_TKN_DATA_TYP = BRACKET;
             cunt = 1;
@@ -288,6 +287,9 @@ void PrintAllTokens (tkn_arr* tk_array)
 {
     for(int i = 0 ; i < tk_array->n_cunt ; i++)
     {
+        assert(i < tk_array->n_cunt);
+        assert(i >= 0);
+
         if      (tk_array->node[i].data_type == CONSTANT)
             printf("%d) data = %.1lf || type = CONSTANT\n", i, tk_array->node[i].data.dbl);
 
@@ -324,14 +326,14 @@ void PrintAllTokens (tkn_arr* tk_array)
 }
 
 Node* GetG (tkn_arr* tk_array)
-{
+{$300$
     tk_array->current_node = 0;
 
     Tree* tree = (Tree*) calloc(1, sizeof(Tree));
     
-    tree->peak = GetStmts(tk_array);
+    tree->peak = GetStmts(tk_array);$300$
         
-    if ($CUR_TKN_DATA_CHR == '$') $CURRENT += 1;
+    if ($CUR_TKN_DATA_CHR == '$')printf("IT IS THE END!!!");
     
     else
     {   
@@ -340,7 +342,7 @@ Node* GetG (tkn_arr* tk_array)
     }
     if (tree->peak == NULL)
     {
-        assert(ERROR && "Something goes wrong, tree->peak = NULL");
+        assert(ERRORR && "Something goes wrong, tree->peak = NULL");
     }   
     else 
     {
@@ -351,7 +353,7 @@ Node* GetG (tkn_arr* tk_array)
 }
 
 Node* GetStmts (tkn_arr* tk_array)
-{
+{$300$
     if ($CUR_TKN_DATA_CHR == '$' || $CUR_TKN_DATA_CHR == '}')
     {
         return NULL;
@@ -360,18 +362,20 @@ Node* GetStmts (tkn_arr* tk_array)
     {
         Node* stmt_node = CreateNode(STATEMENT);
 		
-		Node* stmt  = GetStmt(tk_array);
-		Node* stmts_after = GetStmts(tk_array);
+		Node* stmt  = GetStmt(tk_array);$300$
+		Node* stmts_after = GetStmts(tk_array);$300$
 
         stmt_node->left  = stmts_after;
         stmt_node->right = stmt;
 
 		return stmt_node;
     }
+    assert(0);
+    return NULL;
 }
 
 Node* GetStmt (tkn_arr* tk_array)
-{
+{$300$
     switch($CUR_TKN_DATA_TYP)
     {
         case VARIABLE:
@@ -385,7 +389,7 @@ Node* GetStmt (tkn_arr* tk_array)
 
                 $CURRENT += 1;
 
-                if ($CUR_TKN_DATA_CHR = '{')
+                if ($CUR_TKN_DATA_CHR == '{')
                 {
                     $CURRENT = start_current;
                     Node* define_node = CreateNode(DEFINE);
@@ -397,24 +401,41 @@ Node* GetStmt (tkn_arr* tk_array)
                     
                     $CURRENT += 1;
                     $Require('(');
-                    func_node->right = GetArgs(tk_array);
+                    func_node->right = GetArgs(tk_array);$300$
                     $Require(')');
 
                     $Require('{');
-                    define_node->right = GetStmts(tk_array);
+                    define_node->right = GetStmts(tk_array);$300$
                     $Require('}');
 
                     return define_node;
                 }
                 else 
+                {
                     $CURRENT = start_current;
+
+                    Node* call_node = CreateNode(CALL);
+
+                    call_node->left = &($CURRENT_TOKEN);
+
+                    $CURRENT += 1;
+
+                    $Require('(');
+                    call_node->right = GetArgsCall(tk_array);$300$
+                    $Require(')');
+                    $Require(';');
+
+                    return call_node;
+                    //$CURRENT = start_current;
+                }
+                    
             }
             else 
                 $CURRENT = start_current;
         }
         case CONSTANT:
         {
-            Node* left_part_stmt = GetE(tk_array);
+            Node* left_part_stmt = GetE(tk_array);$300$
 
             Node* op_node = &($CURRENT_TOKEN);
 
@@ -423,7 +444,7 @@ Node* GetStmt (tkn_arr* tk_array)
 
             $CURRENT += 1;
 
-            op_node->right = GetE(tk_array);
+            op_node->right = GetE(tk_array);$300$
             op_node->left = left_part_stmt;
 
             if ($CUR_TKN_DATA_CHR == ')');
@@ -439,13 +460,13 @@ Node* GetStmt (tkn_arr* tk_array)
             $CURRENT += 1;
 
             $Require('(');
-            if_node->left = GetStmt(tk_array);
+            if_node->left = GetStmt(tk_array);$300$
             $Require(')');
 
             $Require('{');
             Node* desision = CreateNode(DESISION);
             if_node->right = desision;
-            desision->left = GetStmts(tk_array);
+            desision->left = GetStmts(tk_array);$300$
             $Require('}');
 
             if ($CUR_TKN_DATA_TYP == ELSE)           
@@ -453,7 +474,7 @@ Node* GetStmt (tkn_arr* tk_array)
                 $CURRENT += 1;
 
                 $Require('{');
-                desision->right = GetStmts(tk_array);
+                desision->right = GetStmts(tk_array);$300$
                 $Require('}');
             }
 
@@ -467,11 +488,11 @@ Node* GetStmt (tkn_arr* tk_array)
             $CURRENT += 1;
 
             $Require('(');
-            while_node->left = GetStmt(tk_array);
+            while_node->left = GetStmt(tk_array);$300$
             $Require(')');
 
             $Require('{');
-            while_node->right = GetStmts(tk_array);
+            while_node->right = GetStmts(tk_array);$300$
             $Require('}');
 
             return while_node;
@@ -481,20 +502,28 @@ Node* GetStmt (tkn_arr* tk_array)
         {
             Node* return_node = &($CURRENT_TOKEN);
             $CURRENT += 1;
-            return_node->left = GetE(tk_array);
+            return_node->left = GetE(tk_array);$300$
             $Require(';');
 
             return return_node;
         }
+        default:
+        {
+            assert(0);
+            return 0;
+        }
     }
+    assert(0);
+    return NULL;
 }
 
 Node* GetE (tkn_arr* tk_array)
-{
-    Node* val = GetT(tk_array);
+{$300$
+    Node* val = GetT(tk_array);$300$
     
     Node* op = val;
     Node* old_op = val;
+
     while($CUR_TKN_DATA_TYP == OPERATOR && ($CUR_TKN_DATA_CHR == '+' || $CUR_TKN_DATA_CHR == '-'))
     {
         old_op = op;
@@ -502,7 +531,7 @@ Node* GetE (tkn_arr* tk_array)
 
         $CURRENT += 1;
         
-        Node* val2 = GetT(tk_array);
+        Node* val2 = GetT(tk_array);$300$
         
         
         op->left = old_op; // TODO bind_l_r(old_op, op, val2)
@@ -514,21 +543,23 @@ Node* GetE (tkn_arr* tk_array)
 }
 
 Node* GetT (tkn_arr* tk_array)
-{
+{$300$
     Node* val = GetP(tk_array);
-    
+    $300$
     Node* op = val;
     Node* old_op = val;
 
+    printf("In func GetT char = %c\n", $CUR_TKN_DATA_CHR);
     while($CUR_TKN_DATA_TYP == OPERATOR && ($CUR_TKN_DATA_CHR == '*' || $CUR_TKN_DATA_CHR == '/'))
     {
+        printf("It is * |||\n");
         old_op = op;
         op = &($CURRENT_TOKEN);
 
         $CURRENT += 1;
 
         Node* val2 = GetP(tk_array);
-
+        $300$
         
         op->left = old_op; // TODO bind_l_r(old_op, op, val2)
         op->right = val2;
@@ -539,26 +570,34 @@ Node* GetT (tkn_arr* tk_array)
 }
 
 Node* GetP (tkn_arr* tk_array)
-{
+{$300$
     if ($CUR_TKN_DATA_CHR == '(')
     {
+        printf("skobka ");
         $CURRENT += 1;
-        Node* val = GetE(tk_array);
-        
-        $CURRENT += 1;
+        printf("after skobka skip %c\n", $CUR_TKN_DATA_CHR);
+        Node* val = GetE(tk_array);$300$
+        $Require(')');
+
+        printf("\tAftr skobki it is %c\n", $CUR_TKN_DATA_CHR);
+
         return val;
     }
     else 
     {
-        Node* val2 = GetN(tk_array);
+        //printf("In func GetP there is a synt error, %c %lf\n", $CUR_TKN_DATA_CHR, $CUR_TKN_DATA_DBL);
+        Node* val2 = GetN(tk_array);$300$
         
         return val2;
     }
 }
 
 Node* GetN (tkn_arr* tk_array)
-{
+{$300$
     Node* val = NULL;
+
+    if ($CUR_TKN_DATA_TYP == DOLLAR)
+        return val;
 
     if ($CUR_TKN_DATA_TYP == CONSTANT)
     {
@@ -568,11 +607,12 @@ Node* GetN (tkn_arr* tk_array)
 
     else if ($CUR_TKN_DATA_TYP == VARIABLE)
     {
-        val = GetV(tk_array);
+        val = GetV(tk_array);$300$
     }
     
     else
     {
+        printf("In func GetN there is a synt error, %c %lf\n", $CUR_TKN_DATA_CHR, $CUR_TKN_DATA_DBL);
         SyntaxERROR(__func__);
     }
 
@@ -580,7 +620,7 @@ Node* GetN (tkn_arr* tk_array)
 }
 
 Node* GetV (tkn_arr* tk_array)
-{
+{$300$
     Node* val = &($CURRENT_TOKEN);
 
     $CURRENT += 1;
@@ -591,11 +631,8 @@ Node* GetV (tkn_arr* tk_array)
         $CURRENT += 1;
 
         Node* call_node = CreateNode(CALL);
-        Node* func_node = CreateNode(FUNCTION);
-        
-        call_node->left = func_node;
 
-        func_node->left = val;
+        call_node->left = val;
 
         if ($CUR_TKN_DATA_CHR == ')')
         {
@@ -607,7 +644,7 @@ Node* GetV (tkn_arr* tk_array)
 
         else
         {
-            func_node->right = GetArgs(tk_array);
+            call_node->right = GetArgs(tk_array);$300$
             $Require(')');
             return call_node;
         }
@@ -617,7 +654,7 @@ Node* GetV (tkn_arr* tk_array)
 }
 
 Node* GetArgs (tkn_arr* tk_array)
-{
+{$300$
     if ($CUR_TKN_DATA_CHR == ')')
     {
         return NULL;
@@ -630,8 +667,33 @@ Node* GetArgs (tkn_arr* tk_array)
         
         Node* param_node = CreateNode(PARAMETER);
 		
-		Node* param  = GetArg(tk_array);
-		Node* params_after = GetArgs(tk_array);
+		Node* param  = GetArg(tk_array);$300$
+		Node* params_after = GetArgs(tk_array);$300$
+
+        param_node->left  = params_after;
+        param_node->right = param;
+
+		return param_node;
+    }
+
+}
+
+Node* GetArgsCall (tkn_arr* tk_array)
+{$300$
+    if ($CUR_TKN_DATA_CHR == ')')
+    {
+        return NULL;
+    }
+
+    else
+    {
+        if ($CUR_TKN_DATA_CHR == ',')
+            $CURRENT += 1;
+        
+        Node* param_node = CreateNode(PARAMETER_CALL);
+		
+		Node* param  = GetArg(tk_array);$300$
+		Node* params_after = GetArgsCall(tk_array);$300$
 
         param_node->left  = params_after;
         param_node->right = param;
@@ -642,13 +704,13 @@ Node* GetArgs (tkn_arr* tk_array)
 }
 
 Node* GetArg (tkn_arr* tk_array)
-{
-    Node* var = GetE(tk_array);
+{$300$
+    Node* var = GetE(tk_array);$300$
     
     return var;
 }
 
-void SyntaxERROR (const char* s)
+[[noreturn]] void SyntaxERROR (const char* s)
 {
     printf("Ha ha oshibsya in function %s\n", s);
     assert(0);
@@ -657,8 +719,9 @@ void SyntaxERROR (const char* s)
 void Require (char ch, tkn_arr* tk_array)
 {
     if ($CUR_TKN_DATA_CHR == ch)
+    {
         $CURRENT += 1;
-
+    }
     else
     {
         printf("Incorrect input, expected '%c' but have '%c'\n", ch, $CUR_TKN_DATA_CHR);
@@ -673,6 +736,22 @@ Node* CreateNode (int node_type)
     
     return node;
 }
+
+#undef $VALUE_IS_OPERATOR
+
+#undef $BUF_CUR_ELEM
+
+#undef $CUR_TKN_DATA_LNG
+#undef $CUR_TKN_DATA_STR
+#undef $CUR_TKN_DATA_DBL
+#undef $CUR_TKN_DATA_CHR
+#undef $CUR_TKN_DATA_TYP
+
+#undef $CURRENT_TOKEN
+#undef $CURRENT
+#undef $300$
+
+#undef $Require
 
 // zvOnit = retuen
 // krasivEe = while

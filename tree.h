@@ -15,9 +15,7 @@ const int MAX_STR_SIZE = 1000;
 
 #define PRINT_LINE printf("I'm at line %d at function %s\n", __LINE__, __func__);
 
-#define TYPE_UNION
-
-const int ERROR = 0;
+const int ERRORR = 0;
 
 enum kostyl
 {
@@ -49,7 +47,10 @@ enum node_data_type
     IF,
     WHILE,
     ELSE,
-    COMMA
+    COMMA,
+    SCAN,
+    RETURN,
+    PRINT
 };
 
 enum exept_node_data_type
@@ -58,9 +59,9 @@ enum exept_node_data_type
     STATEMENT,
     DEFINE,
     FUNCTION,
-    RETURN,
     CALL,
-    PARAMETER
+    PARAMETER,
+    PARAMETER_CALL,
 };
 
 enum operator_type
@@ -71,6 +72,7 @@ enum operator_type
     DIV = '/',
     DEG = '^',
     SIN = 's',
+    EQL = '=',
     COS = 'c'
 };
 

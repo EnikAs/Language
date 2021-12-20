@@ -17,4 +17,12 @@ int main()
     tree->peak = GetG(tk_array);
     
     TreeDump(tree->peak);
+
+    var_lists* vr_lists = (var_lists*) calloc(1, sizeof(var_lists));
+
+    vr_lists->var = (var_list*) calloc(VAR_MAX_CUNT, sizeof(var_list));
+
+    FILE* com_file = fopen("asm_file.txt", "w");
+
+    VisitPrintCommands(tree->peak, vr_lists, com_file);
 }

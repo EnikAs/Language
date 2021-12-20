@@ -1,0 +1,25 @@
+PUSH 1.0
+POP [dx + 0]
+PUSH 0.0
+PUSH [dx + 0]
+JAE :ifistrue00FC9490
+PUSH 0
+JMP :ifisfalse00FC9490
+	::ifistrue00FC9490
+PUSH 1
+	::ifisfalse00FC9490
+PUSH 0
+JNE :true00FC6DA8
+PUSH 9.0
+POP [dx + 0]
+JMP :end00FC6DA8
+	::true00FC6DA8
+PUSH 1488.0
+POP [dx + 0]
+	::end00FC6DA8
+PUSH 0.0
+POP [dx + 0]
+PUSH 0.0
+POP [dx + 0]
+PUSH 0.0
+POP [dx + 0]

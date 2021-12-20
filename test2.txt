@@ -1,0 +1,16 @@
+x = 1;
+suppose (x >= 0) perfomed
+therefore {
+        x = 1488;
+} however {
+        x = 9;
+}
+
+x = 0;
+x = 0;
+x = 0;
+
+Consider {
+        x = x + 1;
+} assuming expression (x == 9) perfomed;
+$

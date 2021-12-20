@@ -87,9 +87,21 @@ int VisitDumpPrint(const Node* node)
     {
         fprintf(log_file, "%d [label =\"parameter\"];\n", node);
     }
+    else if (node->data_type == PARAMETER_CALL)
+    {
+        fprintf(log_file, "%d [label =\"parameter call\"];\n", node);
+    }
     else if (node->data_type == FUNCTION)
     {
         fprintf(log_file, "%d [label =\"function\"];\n", node);
+    }
+    else if (node->data_type == SCAN)
+    {
+        fprintf(log_file, "%d [label =\"scan\"];\n", node);
+    }
+    else if (node->data_type == PRINT)
+    {
+        fprintf(log_file, "%d [label =\"print\"];\n", node);
     }
     if (node->left)
     {

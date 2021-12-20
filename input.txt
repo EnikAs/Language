@@ -1,22 +1,16 @@
-main(a, b)
-word_stress
-    a = b + 2;
+x = 1; 
+tortbl (x >= 0) 
+{
+    x = 1488;
+}
+lattE 
+{
+    x = 9;
+}
 
-    zvOnit a;
-for_weak_people
+x = 0;
+x = 0;
+x = 0;
 
-krasivEe(a >= b)
-word_stress
-    b = b + 1;
-for_weak_people
 
-tortbl(a == 0)
-word_stress
-    a = 3;
-for_weak_people
-
-lattE
-word_stress
-    a = 0;
-for_weak_people
 $
