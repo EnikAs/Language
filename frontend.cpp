@@ -39,6 +39,7 @@ static int     iscomma     (char value);
 
 #define $Require(ch) Require(ch, tk_array)
 
+//==========================================================================
 void CheckPtr(void* ptr, const char* error)
 {
     if (ptr == NULL)
@@ -47,7 +48,7 @@ void CheckPtr(void* ptr, const char* error)
         assert(0);
     }
 }
-
+//==========================================================================
 tkn_arr* GetAllTokens(FILE* inputfile)
 {
     assert(inputfile);
@@ -72,7 +73,7 @@ tkn_arr* GetAllTokens(FILE* inputfile)
 
     return tk_array;
 }
-
+//==========================================================================
 void GetTokens (buffer* buf, tkn_arr* tk_array)
 {
     while( $BUF_CUR_ELEM != '$')
@@ -130,7 +131,7 @@ void GetTokens (buffer* buf, tkn_arr* tk_array)
     tk_array->n_cunt += 1;
 
 }
-
+//==========================================================================
 void    space_skip  (buffer* buf)
 {
     while(isspace($BUF_CUR_ELEM))
@@ -138,7 +139,7 @@ void    space_skip  (buffer* buf)
         buf->pos += 1;
     }
 }
-
+//==========================================================================
 int     get_bracket (buffer* buf, tkn_arr* tk_array)
 {
     $CUR_TKN_DATA_CHR = $BUF_CUR_ELEM;
@@ -149,7 +150,7 @@ int     get_bracket (buffer* buf, tkn_arr* tk_array)
 
     return 1;
 }
-
+//==========================================================================
 int     get_op      (buffer* buf, tkn_arr* tk_array)
 {
     int cunt = 0;
@@ -174,7 +175,7 @@ int     get_op      (buffer* buf, tkn_arr* tk_array)
 
     return cunt;
 }
-
+//==========================================================================
 int     get_num     (buffer* buf, tkn_arr* tk_array)
 {
     int cunt = 0;
@@ -196,7 +197,7 @@ int     get_num     (buffer* buf, tkn_arr* tk_array)
 
     return cunt;
 }
-
+//==========================================================================
 int     get_word    (buffer* buf, tkn_arr* tk_array)
 {
     int cunt = 0;
@@ -244,7 +245,7 @@ int     get_word    (buffer* buf, tkn_arr* tk_array)
 
     return cunt;
 }
-
+//==========================================================================
 int     isnumber    (char value)
 {
     if (value <= '9' && value >= '0')
@@ -253,7 +254,7 @@ int     isnumber    (char value)
     else 
         return 0;
 }
-
+//==========================================================================
 int     isoperator  (char value)
 {
     if ($VALUE_IS_OPERATOR)
@@ -263,7 +264,7 @@ int     isoperator  (char value)
         return 0;
 
 }
-
+//==========================================================================
 int     isbracket   (char value)
 {
     if (value == '(' || value == ')' || value == '{' || value == '}')
@@ -272,7 +273,7 @@ int     isbracket   (char value)
     else
         return 0;
 }
-
+//==========================================================================
 int     iscomma (char value)
 {
     if (value == ',')
@@ -282,7 +283,7 @@ int     iscomma (char value)
     else 
         return 0;
 }
-
+//==========================================================================
 void PrintAllTokens (tkn_arr* tk_array)
 {
     for(int i = 0 ; i < tk_array->n_cunt ; i++)
@@ -324,7 +325,7 @@ void PrintAllTokens (tkn_arr* tk_array)
             printf("%d) data = %c || type = DOLLAR\n", i, tk_array->node[i].data.ch);
     }
 }
-
+//==========================================================================
 Node* GetG (tkn_arr* tk_array)
 {$300$
     tk_array->current_node = 0;
@@ -351,7 +352,7 @@ Node* GetG (tkn_arr* tk_array)
 
     return tree->peak; 
 }
-
+//==========================================================================
 Node* GetStmts (tkn_arr* tk_array)
 {$300$
     if ($CUR_TKN_DATA_CHR == '$' || $CUR_TKN_DATA_CHR == '}')
@@ -373,7 +374,7 @@ Node* GetStmts (tkn_arr* tk_array)
     assert(0);
     return NULL;
 }
-
+//==========================================================================
 Node* GetStmt (tkn_arr* tk_array)
 {$300$
     switch($CUR_TKN_DATA_TYP)
@@ -516,7 +517,7 @@ Node* GetStmt (tkn_arr* tk_array)
     assert(0);
     return NULL;
 }
-
+//==========================================================================
 Node* GetE (tkn_arr* tk_array)
 {$300$
     Node* val = GetT(tk_array);$300$
@@ -541,7 +542,7 @@ Node* GetE (tkn_arr* tk_array)
     
     return op;
 }
-
+//==========================================================================
 Node* GetT (tkn_arr* tk_array)
 {$300$
     Node* val = GetP(tk_array);
@@ -568,7 +569,7 @@ Node* GetT (tkn_arr* tk_array)
     
     return op;
 }
-
+//==========================================================================
 Node* GetP (tkn_arr* tk_array)
 {$300$
     if ($CUR_TKN_DATA_CHR == '(')
@@ -591,7 +592,7 @@ Node* GetP (tkn_arr* tk_array)
         return val2;
     }
 }
-
+//==========================================================================
 Node* GetN (tkn_arr* tk_array)
 {$300$
     Node* val = NULL;
@@ -618,7 +619,7 @@ Node* GetN (tkn_arr* tk_array)
 
     return val;
 }
-
+//==========================================================================
 Node* GetV (tkn_arr* tk_array)
 {$300$
     Node* val = &($CURRENT_TOKEN);
@@ -652,7 +653,7 @@ Node* GetV (tkn_arr* tk_array)
     
     return val;
 }
-
+//==========================================================================
 Node* GetArgs (tkn_arr* tk_array)
 {$300$
     if ($CUR_TKN_DATA_CHR == ')')
@@ -677,7 +678,7 @@ Node* GetArgs (tkn_arr* tk_array)
     }
 
 }
-
+//==========================================================================
 Node* GetArgsCall (tkn_arr* tk_array)
 {$300$
     if ($CUR_TKN_DATA_CHR == ')')
@@ -702,20 +703,20 @@ Node* GetArgsCall (tkn_arr* tk_array)
     }
 
 }
-
+//==========================================================================
 Node* GetArg (tkn_arr* tk_array)
 {$300$
     Node* var = GetE(tk_array);$300$
     
     return var;
 }
-
+//==========================================================================
 [[noreturn]] void SyntaxERROR (const char* s)
 {
     printf("Ha ha oshibsya in function %s\n", s);
     assert(0);
 }
-
+//==========================================================================
 void Require (char ch, tkn_arr* tk_array)
 {
     if ($CUR_TKN_DATA_CHR == ch)
@@ -728,7 +729,7 @@ void Require (char ch, tkn_arr* tk_array)
         assert(0);
     }
 }
-
+//==========================================================================
 Node* CreateNode (int node_type)
 {
     Node* node = (Node*) calloc(1, sizeof(Node));
@@ -736,7 +737,7 @@ Node* CreateNode (int node_type)
     
     return node;
 }
-
+//==========================================================================
 #undef $VALUE_IS_OPERATOR
 
 #undef $BUF_CUR_ELEM

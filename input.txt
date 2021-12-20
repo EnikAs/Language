@@ -1,16 +1,7 @@
 x = 1; 
-tortbl (x >= 0) 
+krasivEe (x == 9)
 {
-    x = 1488;
+    x = x + 1;
 }
-lattE 
-{
-    x = 9;
-}
-
-x = 0;
-x = 0;
-x = 0;
-
 
 $
