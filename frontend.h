@@ -1,7 +1,7 @@
 #ifndef FRONTEND_H_INCLUDED
 #define FRONTEND_H_INCLUDED
 
-#include "C:\TXLib\TX\TXLib.h"
+//#include "C:\TXLib\TX\TXLib.h"
 
 #include <iostream>
 #include <cstring>
@@ -15,7 +15,7 @@
 
 const int KOSTYL = 2;
 const int EXTRA = 1;
-const int MAX_TKN_CUNT = 250;
+const int MAX_TKN_CUNT = 350;
 
 enum strncmp
 {
@@ -37,7 +37,7 @@ struct buffer
     int pos = 0;
 };
 
-tkn_arr*    GetAllTokens    (FILE* inputfile);
+tkn_arr*    GetAllTokens    (FILE* inputfile, buffer* buf);
 
 void        GetTokens       (buffer* buf, tkn_arr* array);
 
@@ -70,5 +70,7 @@ void        Require         (char ch, tkn_arr* tk_array);
 void        SyntaxERROR     (const char* s);
 
 Node*       CreateNode      (int node_type);
+
+void        CheckPtr        (void* ptr, const char* error);
 
 #endif

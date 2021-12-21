@@ -37,11 +37,11 @@ int VisitDumpPrint(const Node* node)
         return 0; // TODO Errors
     if (node->data_type == CONSTANT)
     {
-        fprintf(log_file, "%d [label =\"%.0lf\"];\n", node, node->data.dbl);
+        fprintf(log_file, "%d [label =\"%.0lf\", style = \"filled\", color = \"blue\"];\n", node, node->data.dbl);
     }
     else if (node->data_type == OPERATOR)
     {
-        fprintf(log_file, "%d [label =\"%c\"];\n", node, node->data.ch);
+        fprintf(log_file, "%d [label =\"%c\", style = \"filled\", color = \"orange\"];\n", node, node->data.ch);
     }
     else if (node->data_type == WHILE)
     {
@@ -57,23 +57,23 @@ int VisitDumpPrint(const Node* node)
     }
     else if (node->data_type == RETURN)
     {
-        fprintf(log_file, "%d [label =\"return\"];\n", node);
+        fprintf(log_file, "%d [label =\"return\", style = \"filled\", color = \"red\"];\n", node);
     }
     else if (node->data_type == REL_OPERATOR)
     {
-        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+        fprintf(log_file, "%d [label =\"%.*s\", style = \"filled\", color = \"red\"];\n", node, node->data_lng, node->data.str);
     }
     else if (node->data_type == VARIABLE)
     {
-        fprintf(log_file, "%d [label =\"%.*s\"];\n", node, node->data_lng, node->data.str);
+        fprintf(log_file, "%d [label =\"%.*s\", style = \"filled\", color = \"blue\"];\n", node, node->data_lng, node->data.str);
     }
     else if (node->data_type == DESISION)
     {
-        fprintf(log_file, "%d [label =\"desision\"];\n", node);
+        fprintf(log_file, "%d [label =\"desision\", style = \"filled\", color = \"purple\"];\n", node);
     }
     else if (node->data_type == STATEMENT)
     {
-        fprintf(log_file, "%d [label =\"statement\"];\n", node);
+        fprintf(log_file, "%d [label =\"statement\", style = \"filled\", color = \"green\"];\n", node);
     }
     else if (node->data_type == DEFINE)
     {
@@ -85,11 +85,11 @@ int VisitDumpPrint(const Node* node)
     }
     else if (node->data_type == PARAMETER)
     {
-        fprintf(log_file, "%d [label =\"parameter\"];\n", node);
+        fprintf(log_file, "%d [label =\"parameter\", style = \"filled\", color = \"grey\"];\n", node);
     }
     else if (node->data_type == PARAMETER_CALL)
     {
-        fprintf(log_file, "%d [label =\"parameter call\"];\n", node);
+        fprintf(log_file, "%d [label =\"parameter call\", style = \"filled\", color = \"grey\"];\n", node);
     }
     else if (node->data_type == FUNCTION)
     {

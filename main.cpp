@@ -5,16 +5,19 @@ int main()
 {
     FILE* inputfile = fopen("input.txt", "r");
 
-    tkn_arr* tk_array = GetAllTokens(inputfile);
+    buffer* buf = (buffer*) calloc(1, sizeof(buffer)); 
+    CheckPtr(buf, "buffer callocation error!");
     
-    printf("number of tokens = %d\n", tk_array->n_cunt);
+    tkn_arr* tk_array = GetAllTokens(inputfile, buf);
 
+    fclose (inputfile);
+    
     
     PrintAllTokens(tk_array);
     
-    Tree* tree = (Tree*) calloc(1 + KOSTYL, sizeof(Tree));
+    Tree* tree = (Tree*) calloc(1 , sizeof(Tree));
     
-    //tree->peak = (Node*) calloc(1, sizeof(Node));
+    tree->peak = (Node*) calloc(1, sizeof(Node));
     
     tree->peak = GetG(tk_array);
     
@@ -22,11 +25,18 @@ int main()
 
     GenerateAsmCode(tree->peak);
 
-    FreeTheTree(tree);
-
     system("C:/VSCprogs/Processor/CPU/cpu.exe");
 
-    printf("EEEEEND !");
+    
 
+    free(tree->peak);
+    free(tree);
+    free(tk_array->node);
+    free(tk_array);
+    free(buf->data);
+    free(buf);
+
+    printf("END !");
+    
     return 0;
 }

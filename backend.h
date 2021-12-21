@@ -27,7 +27,7 @@ int     GenerateAsmCode         (Node* node);
 
 int     VisitPrintCommands      (Node* node, var_lists* vr_lists, FILE* com_file);
 
-int     Move_dx                 (int shift, FILE* com_file, int key);
+void    Move_dx                 (int shift, FILE* com_file, int key);
 
 int     FindVariable            (var_lists* vr_list, int hash);
 

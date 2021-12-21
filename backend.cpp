@@ -32,7 +32,6 @@ int GenerateAsmCode(Node* node)
 
     FILE* com_file = fopen("asm_file.txt", "w");
 
-    $PRINT("PUSH 0\nPOP dx\n");
     VisitPrintCommands(node, vr_lists, com_file);
     $PRINT("HLT");
 
@@ -56,21 +55,33 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
         }
         case OPERATOR:
         {
-            if ($R->data_type == CONSTANT || $R->data_type == VARIABLE)
-                $PRINT("PUSH ");
-            $VISIT($R);
-
             if ($ND_CHR == EQL)
             {
+                if ($R->data_type == CONSTANT || $R->data_type == VARIABLE)
+                    $PRINT("PUSH ");
+
+                $VISIT($R);
+
                 $PRINT("POP ");
+
+                if ($L->data_type == CONSTANT || $L->data_type == VARIABLE)
+
                 $VISIT($L);
 
                 return 0;
             }
 
             if ($L->data_type == CONSTANT || $L->data_type == VARIABLE)
-            $PRINT("PUSH ");
+                $PRINT("PUSH ");
+
             $VISIT($L);
+
+            
+
+            if ($R->data_type == CONSTANT || $R->data_type == VARIABLE)
+                $PRINT("PUSH ");
+
+            $VISIT($R);
 
             switch ($ND_CHR)
             {
@@ -108,7 +119,7 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             break;
         }
         case VARIABLE:
-        {
+        {PRINT_LINE
             int tmp_var_hash = murmurHash($ND_STR, node->data_lng);
             int tmp_var_num  = FindVariable(vr_lists, tmp_var_hash);
 
@@ -164,7 +175,7 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             break;
         }
         case PARAMETER:
-        {
+        {PRINT_LINE
             printf("I am in parametr !\n");
             int tmp_hash = murmurHash(node->right->data.str, node->right->data_lng);
 
@@ -179,7 +190,8 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
         }
         case PARAMETER_CALL:
         {
-            $PRINT("PUSH ");
+            if ($R->data_type == CONSTANT || $R->data_type == VARIABLE)
+                $PRINT("PUSH ");
             
             $VISIT($R);
             
@@ -188,40 +200,63 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             break;
         }
         case CALL:
-        {
+        {PRINT_LINE
             if (strncmp(node->left->data.str, "scan", 4) == 0)
-            {  
+            { PRINT_LINE
                 $PRINT("IN\n");
                 $PRINT("POP ");
                 
                 int tmp_hash    = murmurHash(node->right->right->data.str, node->right->right->data_lng);
                 int tmp_var_num = FindVariable(vr_lists, tmp_hash);
                 if (tmp_var_num == -1 )
-                    assert(0 && "VARIABLE IN SCAN NOT FOUND");
+                    assert(0 && "VARIABLE IN SCAN NOT FOUND YOU ARE GONNA WORK WITH RUBBISH !!!!!!!");
 
                 $PRINT("[%d+dx]\n", vr_lists->var[tmp_var_num].var_dx_shift);
             }
             
             else if (strncmp(node->left->data.str, "print", 5) == 0)
-            {
-                int tmp_hash    = murmurHash(node->right->right->data.str, node->right->right->data_lng);
-                int tmp_var_num = FindVariable(vr_lists, tmp_hash);
-                if (tmp_var_num == -1 )
-                    assert(0 && "VARIABLE IN PRINT NOT FOUND");
+            {PRINT_LINE
+                if (node->right->right->data_type == VARIABLE)
+                {
+                    int tmp_hash    = murmurHash(node->right->right->data.str, node->right->right->data_lng);
+                    int tmp_var_num = FindVariable(vr_lists, tmp_hash);
+                    PRINT_LINE
+                    if (tmp_var_num == -1 )
+                    {
+                        assert(0 && "VARIABLE IN PRINT NOT FOUND! YOU ARE GONNA WORK WITH RUBBISH !!!!!!!");
+                    }
 
-                $PRINT("PUSH [%d+dx]\n", vr_lists->var[tmp_var_num].var_dx_shift);
-                $PRINT("PRCH\n");
+                    $PRINT("PUSH [%d+dx]\n", vr_lists->var[tmp_var_num].var_dx_shift);
+                    $PRINT("PRCH\n");
+                }
+                else if (node->right->right->data_type == CONSTANT)
+                {
+                    $PRINT("PUSH %lf\n", node->right->right->data.dbl);
+                    $PRINT("PRCH\n");
+                }
+                else 
+                    assert(0 && "INCORRECT PRINT ARG");
             }
 
             else if (strncmp(node->left->data.str, "sqrt", 4) == 0)
-            {
-                int tmp_hash    = murmurHash(node->right->right->data.str, node->right->right->data_lng);
-                int tmp_var_num = FindVariable(vr_lists, tmp_hash);
-                if (tmp_var_num == -1 )
-                    assert(0 && "VARIABLE IN PRINT NOT FOUND");
+            {PRINT_LINE
+                if (node->right->right->data_type == VARIABLE)
+                {
+                    int tmp_hash    = murmurHash(node->right->right->data.str, node->right->right->data_lng);
+                    int tmp_var_num = FindVariable(vr_lists, tmp_hash);
+                    if (tmp_var_num == -1 )
+                        assert(0 && "VARIABLE IN SQRT NOT FOUND YOU ARE GONNA WORK WITH RUBBISH !!!!!!!");
 
-                $PRINT("PUSH [%d+dx]\n", vr_lists->var[tmp_var_num].var_dx_shift);
-                $PRINT("SQRT\n");
+                    $PRINT("PUSH [%d+dx]\n", vr_lists->var[tmp_var_num].var_dx_shift);
+                    $PRINT("SQRT\n");
+                }
+                else if (node->right->right->data_type == CONSTANT)
+                {
+                    $PRINT("PUSH %lf\n", node->right->right->data.dbl);
+                    $PRINT("SQRT\n");
+                }
+                else 
+                    assert(0 && "INCORRECT SQRT ARG");
             }
             
             else
@@ -257,12 +292,14 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
         case DESISION:
         {
             $PRINT("JNE :itrue%p\n", node);
-            $VISIT($R);
             $PRINT("JMP :iend%p\n", node);
             $PRINT("::itrue%p\n", node);
             $VISIT($L);
+            $PRINT("JMP :ifskip%p\n", node);
             $PRINT("::iend%p\n", node);
-
+            $VISIT($R);
+            $PRINT("::ifskip%p\n", node);
+            
             break;
         }
         case REL_OPERATOR:
@@ -328,9 +365,10 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             assert(0 && "Shit happen(s) (undefined case in VisitPrintCommands switch)");
         }
     }
+    return 0;
 }
 //==========================================================================
-int Move_dx (int shift, FILE* com_file, int key)
+void Move_dx (int shift, FILE* com_file, int key)
 {
     if (key == PLUS)
     {
