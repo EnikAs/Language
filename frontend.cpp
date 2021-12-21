@@ -33,7 +33,8 @@ static int     iscomma     (char value);
 #define $CURRENT (tk_array->current_node)
 
 //#define $300$ printf("I was in function %s\n", __func__);
-#define $300$ printf("cur = %d\n", $CURRENT);
+//#define $300$ printf("cur = %d\n", $CURRENT);
+#define $300$ 
 
 #define $Require(ch) Require(ch, tk_array)
 
@@ -203,7 +204,7 @@ int     get_word    (buffer* buf, tkn_arr* tk_array)
 
     $CUR_TKN_DATA_STR = &($BUF_CUR_ELEM);
     
-    while (isalpha($BUF_CUR_ELEM) || $BUF_CUR_ELEM == '_')
+    while (isalpha($BUF_CUR_ELEM) || $BUF_CUR_ELEM == '_'||$BUF_CUR_ELEM == '\'')
     {
         cunt += 1;
         buf->pos += 1;
@@ -231,7 +232,7 @@ int     get_word    (buffer* buf, tkn_arr* tk_array)
     {
         $CUR_TKN_DATA_TYP = IF;
     }
-    else if (strncmp($CUR_TKN_DATA_STR, "krasivEe", 8) == EQUAL)
+    else if (strncmp($CUR_TKN_DATA_STR, "pinzhak", 7) == EQUAL)
     {
         $CUR_TKN_DATA_TYP = WHILE;
     }
@@ -660,7 +661,6 @@ Node* GetV (tkn_arr* tk_array)
 
     if ($CUR_TKN_DATA_CHR == '(' && $CUR_TKN_DATA_TYP == BRACKET)
     {
-        printf("it is function)))\n");
         $CURRENT += 1;
 
         Node* call_node = CreateNode(CALL);
@@ -669,7 +669,6 @@ Node* GetV (tkn_arr* tk_array)
 
         if ($CUR_TKN_DATA_CHR == ')' && $CUR_TKN_DATA_TYP == BRACKET)
         {
-            printf("but without args!\n");
             $CURRENT += 1;
 
             return call_node;
@@ -781,6 +780,62 @@ Node* CreateNode (int node_type)
     return node;
 }
 //==========================================================================
+#include "rev_frontend.h"
+
+int VisitPrintTree (Node* node)
+{
+    printf("(");
+
+    if(node->left)
+        VisitPrintTree(node->left);
+
+    switch(node->data_type)
+    {
+        case STATEMENT:
+            printf("statement");
+            break;
+        case DEFINE:
+            printf("define");
+            break;
+        case FUNCTION:
+            printf("function");
+            break;
+        case OPERATOR:
+            printf("%c", node->data.ch);
+            break;
+        case REL_OPERATOR:
+            printf("%.*s", node->data_lng, node->data.str);
+            break;
+        case CALL:
+            printf("call");
+            break;
+        case VARIABLE:
+            printf("%.*s", node->data_lng, node->data.str);
+            break;
+        case CONSTANT:
+            printf("%lf", node->data.dbl);
+            break;
+        case PARAMETER:
+            printf("parametr");
+            break;
+        case PARAMETER_CALL:
+            printf("parametr");
+            break;
+    }    
+
+    if (node->right)
+        VisitPrintTree(node->right);
+
+    printf(")");
+}
+
+
+
+
+
+
+
+
 #undef $VALUE_IS_OPERATOR
 
 #undef $BUF_CUR_ELEM

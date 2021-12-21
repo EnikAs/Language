@@ -9,15 +9,23 @@ scan(c);
 
 tortbl (a == 0)
 {
-    tortbl (b != 0)
+    tortbl (c == 0)
     {
-        var = (0 - 1) * c / b;
+        var = 0;
         print(var);
     }
     lattE
     {
-        var = 228;
-        print(var);
+        tortbl (b != 0)
+        {
+            var = (0 - 1) * c / b;
+            print(var);
+        }
+        lattE
+        {
+            var = 228;
+            print(var);
+        }
     }
 }
 lattE
@@ -36,6 +44,7 @@ lattE
         print(1488);
     }
 }
+
 
 
 $

@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "cassert": "cpp"
+        "cassert": "cpp",
+        "iostream": "cpp"
     },
     "workbench.preferredHighContrastColorTheme": "Default Light+"
 }

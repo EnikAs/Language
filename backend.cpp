@@ -119,7 +119,7 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             break;
         }
         case VARIABLE:
-        {PRINT_LINE
+        {
             int tmp_var_hash = murmurHash($ND_STR, node->data_lng);
             int tmp_var_num  = FindVariable(vr_lists, tmp_var_hash);
 
@@ -150,16 +150,16 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             
             $VISIT_NEW_LIST($L, &vr_lists_new);
 
-            PRINT_LINE
+            
 
-            $PRINT("POP ex\n");
+            //$PRINT("POP ex\n");
 
             printf("Number of args = %d\n", vr_lists_new.free);
             for (int i = vr_lists_new.free - 1 ; i >= 0 ; i--)
             {
                 $PRINT("POP [%d+dx]\n", i);
             }
-            $PRINT("PUSH ex\n");
+            //$PRINT("PUSH ex\n");
             $VISIT_NEW_LIST($R, &vr_lists_new);
 
             free(vr_lists_new.var);
@@ -175,8 +175,7 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             break;
         }
         case PARAMETER:
-        {PRINT_LINE
-            printf("I am in parametr !\n");
+        {
             int tmp_hash = murmurHash(node->right->data.str, node->right->data_lng);
 
             $FREE_VAR.var_dx_shift = $FREE;
@@ -200,9 +199,9 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             break;
         }
         case CALL:
-        {PRINT_LINE
+        {
             if (strncmp(node->left->data.str, "scan", 4) == 0)
-            { PRINT_LINE
+            { 
                 $PRINT("IN\n");
                 $PRINT("POP ");
                 
@@ -215,12 +214,12 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             }
             
             else if (strncmp(node->left->data.str, "print", 5) == 0)
-            {PRINT_LINE
+            {
                 if (node->right->right->data_type == VARIABLE)
                 {
                     int tmp_hash    = murmurHash(node->right->right->data.str, node->right->right->data_lng);
                     int tmp_var_num = FindVariable(vr_lists, tmp_hash);
-                    PRINT_LINE
+                    
                     if (tmp_var_num == -1 )
                     {
                         assert(0 && "VARIABLE IN PRINT NOT FOUND! YOU ARE GONNA WORK WITH RUBBISH !!!!!!!");
@@ -239,7 +238,7 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
             }
 
             else if (strncmp(node->left->data.str, "sqrt", 4) == 0)
-            {PRINT_LINE
+            {
                 if (node->right->right->data_type == VARIABLE)
                 {
                     int tmp_hash    = murmurHash(node->right->right->data.str, node->right->right->data_lng);
@@ -272,13 +271,11 @@ int VisitPrintCommands (Node* node, var_lists* vr_lists, FILE* com_file)
         }
         case RETURN:
         {
-            //$PRINT("POP ex\n");
             if ($L->data_type == CONSTANT || $L->data_type == VARIABLE)
                 $PRINT("PUSH ");
             $VISIT($L);
             $PRINT("POP ax\n");
-            //$PRINT("POP ex\n");
-            //$PRINT("PUSH ex\n");
+
             $PRINT("RET\n");
             break;
         }
@@ -459,12 +456,3 @@ int murmurHash (char * key, unsigned int len)
 #undef $VISIT
 #undef $VISIT_NEW_LIST
 #undef $PRINT
-/*main(a, b)
-word_stress
-    a = (b + 2) * (b + 2 );
-
-    zvOnit a;
-for_weak_people
-
-main(1, 3);
-$*/

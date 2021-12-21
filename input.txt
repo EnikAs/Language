@@ -9,6 +9,8 @@ factorial(x)
 }
 
 x = 5;
-factorial(x);
+scan(x);
+x = factorial(x);
 print(x);
+
 $
